@@ -115,31 +115,31 @@ jobs:
           repo --trace sync -c -j$(nproc --all) --no-tags
           df -h
 
-#      - name: Setup KernelSU
-#        env:
-#          PATCH_PATH: ${{ inputs.patch_path }}
-#          IS_DEBUG_KERNEL: ${{ inputs.debug }}
-#        run: |
-#          cd $GITHUB_WORKSPACE/android-kernel
-#          echo "[+] KernelSU setup"
-#          GKI_ROOT=$(pwd)
-#          echo "[+] GKI_ROOT: $GKI_ROOT"
-#          echo "[+] Copy KernelSU driver to $GKI_ROOT/common/drivers"
-#          ln -sf $GITHUB_WORKSPACE/KernelSU/kernel $GKI_ROOT/common/drivers/kernelsu
-#          echo "[+] Add KernelSU driver to Makefile"
-#          DRIVER_MAKEFILE=$GKI_ROOT/common/drivers/Makefile
-#          DRIVER_KCONFIG=$GKI_ROOT/common/drivers/Kconfig
-#          grep -q "kernelsu" "$DRIVER_MAKEFILE" || printf "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE"
-#          grep -q "kernelsu" "$DRIVER_KCONFIG" || sed -i "/endmenu/i\\source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG"
-#          echo "[+] Apply KernelSU patches"
-#          cd $GKI_ROOT/common/ && git apply $GITHUB_WORKSPACE/KernelSU/.github/patches/$PATCH_PATH/*.patch || echo "[-] No patch found"
-#
-#          if [ "$IS_DEBUG_KERNEL" = "true" ]; then
-#            echo "[+] Enable debug features for kernel"
-#            printf "\nccflags-y += -DCONFIG_KSU_DEBUG\n" >> $GITHUB_WORKSPACE/KernelSU/kernel/Makefile
-#          fi
-#          repo status
-#          echo "[+] KernelSU setup done."
+      - name: Setup KernelSU
+        env:
+          PATCH_PATH: ${{ inputs.patch_path }}
+          IS_DEBUG_KERNEL: ${{ inputs.debug }}
+        run: |
+          cd $GITHUB_WORKSPACE/android-kernel
+          echo "[+] KernelSU setup"
+          GKI_ROOT=$(pwd)
+          echo "[+] GKI_ROOT: $GKI_ROOT"
+          echo "[+] Copy KernelSU driver to $GKI_ROOT/common/drivers"
+          ln -sf $GITHUB_WORKSPACE/KernelSU/kernel $GKI_ROOT/common/drivers/kernelsu
+          echo "[+] Add KernelSU driver to Makefile"
+          DRIVER_MAKEFILE=$GKI_ROOT/common/drivers/Makefile
+          DRIVER_KCONFIG=$GKI_ROOT/common/drivers/Kconfig
+          grep -q "kernelsu" "$DRIVER_MAKEFILE" || printf "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE"
+          grep -q "kernelsu" "$DRIVER_KCONFIG" || sed -i "/endmenu/i\\source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG"
+          echo "[+] Apply KernelSU patches"
+          cd $GKI_ROOT/common/ && git apply $GITHUB_WORKSPACE/KernelSU/.github/patches/$PATCH_PATH/*.patch || echo "[-] No patch found"
+
+          if [ "$IS_DEBUG_KERNEL" = "true" ]; then
+            echo "[+] Enable debug features for kernel"
+            printf "\nccflags-y += -DCONFIG_KSU_DEBUG\n" >> $GITHUB_WORKSPACE/KernelSU/kernel/Makefile
+          fi
+          repo status
+          echo "[+] KernelSU setup done."
 
       - name: Symbol magic
         run: |
