@@ -114,17 +114,16 @@ jobs:
           repo --version
           repo --trace sync -c -j$(nproc --all) --no-tags
           git clone https://github.com/jetecho/android_kernel_oneplus_sm8650.git -b oneplus/sm8650_u_14.0.0_oneplus12 oneplus
-          tree
           df -h
 
-      - name: Make working directory clean to avoid dirty
-        working-directory: android-kernel
-        run: |
-          #          rm common/android/abi_gki_protected_exports_* || echo "No protected exports!"
-               git config --global user.email "bot@kernelsu.org"
-               git config --global user.name "KernelSUBot"
-               cd common/ && git add -A && git commit -a -m "Add KernelSU"
-               repo status
+#      - name: Make working directory clean to avoid dirty
+      #        working-directory: android-kernel
+      #        run: |
+      #          rm common/android/abi_gki_protected_exports_* || echo "No protected exports!"
+      #          git config --global user.email "bot@kernelsu.org"
+      #          git config --global user.name "KernelSUBot"
+      #          cd common/ && git add -A && git commit -a -m "Add KernelSU"
+      #          repo status
 
       - name: Build Kernel/LKM
         working-directory: android-kernel
