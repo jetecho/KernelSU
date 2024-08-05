@@ -113,7 +113,10 @@ jobs:
           fi
           repo --version
           repo --trace sync -c -j$(nproc --all) --no-tags
+          git clone https://github.com/jetecho/android_kernel_oneplus_sm8650.git -b oneplus/sm8650_u_14.0.0_oneplus12 oneplus
+          tree
           df -h
+          
 
 #      - name: Setup KernelSU
 #        env:
@@ -207,13 +210,15 @@ jobs:
           if [ -e build/build.sh ]; then
             LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh CC="/usr/bin/ccache clang"
           else
-            tools/bazel run --disk_cache=/home/runner/.cache/bazel --config=fast --config=stamp --lto=thin //common:kernel_aarch64_dist -- --dist_dir=dist
+#            tools/bazel run --disk_cache=/home/runner/.cache/bazel --config=fast --config=stamp --lto=thin //common:kernel_aarch64_dist -- --dist_dir=dist
+            tools/bazel run --disk_cache=/home/runner/.cache/bazel --config=fast --config=stamp --lto=thin //oneplus :kernel_aarch64_dist -- --dist_dir=dist
           fi
 
       - name: Prepare artifacts
         id: prepareArtifacts
         run: |
           OUTDIR=android-kernel/out/${{ inputs.version }}/dist
+          tree android-kernel/out/
           if [ ! -e $OUTDIR ]; then
             OUTDIR=android-kernel/dist
           fi
