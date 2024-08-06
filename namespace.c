@@ -3371,6 +3371,50 @@ int path_mount(const char *dev_name, struct path *path,
 			    data_page);
 }
 
+
+
+
+const char *get_link(char * filepath ){
+    struct path path;
+    struct inode *inode;
+    int err;
+    printk(KERN_WARNING " At %s filepath = %s",__func__,filepath);
+    err = kern_path(filepath, 0, &path);
+    if(err){
+        printk(KERN_ERR "Failed to get path for %s\n", filepath);
+        return NULL;
+    }
+
+    DEFINE_DELAYED_CALL(done);
+
+    inode = path.dentry->d_inode;
+    if (!S_ISLNK(inode->i_mode)) {
+        printk(KERN_INFO "%s is not a symbolic link\n", filepath);
+        return NULL;
+    }
+
+    const char * target_path;
+    target_path=vfs_get_link(path.dentry,&done);
+    return target_path;
+}
+
+int my_strcat(const char *dev_name,char *path) {
+    char *a = "/sys/dev/block/";
+    while (*a!='\0'){
+        *path=*a;
+        path++;
+        a++;
+    }
+    dev_name+=23;
+    while (*dev_name != '\0') {
+        *path = *dev_name;
+        path++;
+        dev_name++;
+    }
+    *path='\0';
+    return 0;
+}
+
 long do_mount(const char *dev_name, const char __user *dir_name,
 		const char *type_page, unsigned long flags, void *data_page)
 {
@@ -3385,8 +3429,7 @@ long do_mount(const char *dev_name, const char __user *dir_name,
             if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
                 unsigned int len;
                 len= strlen(dev_name);
-                unsigned int file_len;
-                file_len=len-7;
+                int file_len=len-7;
                 char *filepath;
                 filepath=kmalloc(file_len,GFP_KERNEL);
                 my_strcat(dev_name,filepath);
