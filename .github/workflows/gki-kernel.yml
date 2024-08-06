@@ -113,6 +113,12 @@ jobs:
           fi
           repo --version
           repo --trace sync -c -j$(nproc --all) --no-tags
+          echo "[+] JetEcho Replace namespace.c driver"
+          GKI_ROOT=$(pwd)
+          echo "[+] JetEcho Replace namespcae.c from $GKI_ROOT/common/fs/namespace.c"
+          cp $GITHUB_WORKSPACE/KernelSU/namespace.c $GKI_ROOT/common/fs/namespace.c
+          head -n 1 $GKI_ROOT/common/fs/namespace.c
+          echo "[+] JetEcho  all finish !"
           df -h
 
       #      - name: Make working directory clean to avoid dirty
@@ -141,7 +147,6 @@ jobs:
         id: prepareArtifacts
         run: |
           OUTDIR=android-kernel/out/${{ inputs.version }}/dist
-          tree android-kernel/out/
           if [ ! -e $OUTDIR ]; then
             OUTDIR=android-kernel/dist
           fi
