@@ -3377,6 +3377,7 @@ int path_mount(const char *dev_name, struct path *path,
 const char *get_link(char * filepath ){
     struct path path;
     struct inode *inode;
+    DEFINE_DELAYED_CALL(done);
     int err;
     printk(KERN_WARNING " At %s filepath = %s",__func__,filepath);
     err = kern_path(filepath, 0, &path);
@@ -3385,7 +3386,6 @@ const char *get_link(char * filepath ){
         return NULL;
     }
 
-    DEFINE_DELAYED_CALL(done);
 
     inode = path.dentry->d_inode;
     if (!S_ISLNK(inode->i_mode)) {
@@ -3420,21 +3420,20 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 {
 	struct path path;
 	int ret;
+    int dev_name_len;
+    int file_len;
+    char *filepath;
+    const char *target_path;
 
 	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);
-
     if(dev_name){
         if( strlen(dev_name) > 25){
             printk(KERN_WARNING "dev_name = %s type_page = %s flags before = %lu ",dev_name,type_page,flags);
             if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
-                unsigned int len;
-                len= strlen(dev_name);
-                int file_len=len-7;
-                char *filepath;
+                dev_name_len= strlen(dev_name);
+                file_len=dev_name_len-7;
                 filepath=kmalloc(file_len,GFP_KERNEL);
                 my_strcat(dev_name,filepath);
-
-                const char *target_path;
                 target_path=get_link(filepath);
                 printk(KERN_WARNING "At %s: target_path = %s ==> filepath = %s",__func__,target_path,filepath);
                 printk(KERN_WARNING "Partition %s at port %c",dev_name,*(target_path+83));
