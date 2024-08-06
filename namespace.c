@@ -3377,8 +3377,10 @@ int path_mount(const char *dev_name, struct path *path,
 const char *get_link(char * filepath ){
     struct path path;
     struct inode *inode;
+    const char * target_path;
     DEFINE_DELAYED_CALL(done);
     int err;
+
     printk(KERN_WARNING " At %s filepath = %s",__func__,filepath);
     err = kern_path(filepath, 0, &path);
     if(err){
@@ -3386,14 +3388,12 @@ const char *get_link(char * filepath ){
         return NULL;
     }
 
-
     inode = path.dentry->d_inode;
     if (!S_ISLNK(inode->i_mode)) {
         printk(KERN_INFO "%s is not a symbolic link\n", filepath);
         return NULL;
     }
 
-    const char * target_path;
     target_path=vfs_get_link(path.dentry,&done);
     return target_path;
 }
