@@ -1,4 +1,3 @@
-//Changed By JetEcho
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  *  linux/fs/namespace.c
@@ -2628,7 +2627,12 @@ static int do_remount(struct path *path, int ms_flags, int sb_flags,
 	if (IS_ERR(fc))
 		return PTR_ERR(fc);
 
+	/*
+	 * Indicate to the filesystem that the remount request is coming
+	 * from the legacy mount system call.
+	 */
 	fc->oldapi = true;
+
 	err = parse_monolithic_mount_data(fc, data);
 	if (!err) {
 		down_write(&sb->s_umount);
@@ -2886,6 +2890,12 @@ static int do_new_mount(struct path *path, const char *fstype, int sb_flags,
 	put_filesystem(type);
 	if (IS_ERR(fc))
 		return PTR_ERR(fc);
+
+	/*
+	 * Indicate to the filesystem that the mount request is coming
+	 * from the legacy mount system call.
+	 */
+	fc->oldapi = true;
 
 	if (subtype)
 		err = vfs_parse_fs_string(fc, "subtype",
@@ -3231,30 +3241,28 @@ int path_mount(const char *dev_name, struct path *path,
 			    data_page);
 }
 
-
-
 const char *get_link(char * filepath ){
-	struct path path;
-	struct inode *inode;
-	const char * target_path;
-	DEFINE_DELAYED_CALL(done);
-	int err;
-	
-	printk(KERN_WARNING " At %s filepath = %s",__func__,filepath);
-	err = kern_path(filepath, 0, &path);
-	if(err){
-		printk(KERN_ERR "Failed to get path for %s\n", filepath);
-		return NULL;
-	}
-	inode = path.dentry->d_inode;
-	if (!S_ISLNK(inode->i_mode)) {
-		printk(KERN_INFO "%s is not a symbolic link\n", filepath);
-		return NULL;
-	}
+    struct path path;
+    struct inode *inode;
+    const char * target_path;
+    DEFINE_DELAYED_CALL(done);
+    int err;
 
-	
-	target_path=vfs_get_link(path.dentry,&done);
-	return target_path;
+    printk(KERN_WARNING " At %s filepath = %s",__func__,filepath);
+    err = kern_path(filepath, 0, &path);
+    if(err){
+        printk(KERN_ERR "Failed to get path for %s\n", filepath);
+        return NULL;
+    }
+
+    inode = path.dentry->d_inode;
+    if (!S_ISLNK(inode->i_mode)) {
+        printk(KERN_INFO "%s is not a symbolic link\n", filepath);
+        return NULL;
+    }
+
+    target_path=vfs_get_link(path.dentry,&done);
+    return target_path;
 }
 
 int my_strcat(const char *dev_name,char *path) {
@@ -3279,37 +3287,38 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 {
 	struct path path;
 	int ret;
-    	int dev_name_len;
-    	int file_len;
-	char *filepath;
-	const char *target_path;
+    int dev_name_len;
+    int file_len;
+    char *filepath;
+    const char *target_path;
 
 	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);
-	if(dev_name){
-		if( strlen(dev_name) > 25){
-			printk(KERN_WARNING "dev_name = %s type_page = %s flags before = %lu\n",dev_name,type_page,flags);
-			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
-				dev_name_len= strlen(dev_name);
-				file_len=dev_name_len-7;
-				filepath=kmalloc(file_len,GFP_KERNEL);
-				my_strcat(dev_name,filepath);
-				target_path=get_link(filepath);
-				printk(KERN_WARNING "At %s: target_path = %s ==> filepath = %s\n",__func__,target_path,filepath);
-				printk(KERN_WARNING "Partition %s at port %c\n",dev_name,*(target_path+83));
-				if(*(target_path+83)!='2'&&*(target_path+83)!='3'){
-					flags|=1;
-					printk(KERN_WARNING " flag after = %lu\n",(flags));
-				}
-				kfree(filepath);
-			}
-		}
-	}
+    if(dev_name){
+        if( strlen(dev_name) > 25){
+            printk(KERN_WARNING "dev_name = %s type_page = %s flags before = %lu\n",dev_name,type_page,flags);
+            if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
+                dev_name_len= strlen(dev_name);
+                file_len=dev_name_len-7;
+                filepath=kmalloc(file_len,GFP_KERNEL);
+                my_strcat(dev_name,filepath);
+                target_path=get_link(filepath);
+                printk(KERN_WARNING "At %s: target_path = %s ==> filepath = %s\n",__func__,target_path,filepath);
+                printk(KERN_WARNING "Partition %s at port %c\n",dev_name,*(target_path+83));
+                if(*(target_path+83)!='2'&&*(target_path+83)!='3'){
+                    flags|=1;
+                    printk(KERN_WARNING " flag after = %lu\n",(flags));
+                }
+                kfree(filepath);
+            }
+        }
+    }
 	if (ret)
 		return ret;
 	ret = path_mount(dev_name, &path, type_page, flags, data_page);
 	path_put(&path);
 	return ret;
 }
+
 static struct ucounts *inc_mnt_namespaces(struct user_namespace *ns)
 {
 	return inc_ucount(ns, current_euid(), UCOUNT_MNT_NAMESPACES);
