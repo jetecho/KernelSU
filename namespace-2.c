@@ -3306,7 +3306,7 @@ long do_mount(const char *dev_name, const char __user *dir_name,
                 printk(KERN_WARNING "At %s: Partition port %c%c%c%c\n",__func__,dev_name,*(target_path+95),*(target_path+96),*(target_path+97),*(target_path+98),*(target_path+99));
                 if(*(target_path+99)!='2'&&*(target_path+99)!='3'){
                     flags|=1;
-                    printk(KERN_WARNING " flag after = %lu\n",(flags));
+                    printk(KERN_WARNING "At %s: flag after = %lu\n",__func__,(flags));
                 }
                 kfree(filepath);
             }
