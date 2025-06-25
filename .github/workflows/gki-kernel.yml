@@ -103,15 +103,9 @@ jobs:
           cd $GITHUB_WORKSPACE
           sudo apt-get install repo -y
           mkdir android-kernel && cd android-kernel
-#          repo init --depth=1 --u https://github.com/OnePlusOSS/kernel_manifest.git -b ${{ inputs.tag }} --repo-rev=v2.16
           repo init --depth=1 -m $GITHUB_WORKSPACE/KernelSU/.github/manifests/oneplus_13.xml
           REMOTE_BRANCH=$(git ls-remote https://github.com/jetecho/android_kernel_common_oneplus_sm8750.git)
-#          DEFAULT_MANIFEST_PATH=.repo/manifests/oneplus_13.xml
-#          if grep -q deprecated <<< $REMOTE_BRANCH; then
-#            echo "Found deprecated branch: ${{ inputs.tag }}"
-#            sed -i 's/"${{ inputs.tag }}"/"deprecated\/${{ inputs.tag }}"/g' $DEFAULT_MANIFEST_PATH
-#            cat $DEFAULT_MANIFEST_PATH
-#          fi
+
           repo --version
           repo --trace sync -c -j$(nproc --all) --no-tags
           echo "[+] JetEcho Replace namespace.c driver"
