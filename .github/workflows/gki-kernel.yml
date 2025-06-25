@@ -204,11 +204,15 @@ jobs:
       - name: Make working directory clean to avoid dirty
         working-directory: android-kernel
         run: |
-          rm common/android/abi_gki_protected_exports_* || echo "No protected exports!"
-          git config --global user.email "tanzhifu789@163.com"
-          git config --global user.name "jetecho"
-          cd common/ && git add -A && git commit -a -m "Add KernelSU"
-          repo status
+          if [ ! -z ${{ vars.EXPECTED_SIZE }} ] && [ ! -z ${{ vars.EXPECTED_HASH }} ]; then
+           export KSU_EXPECTED_SIZE=${{ vars.EXPECTED_SIZE }}
+           export KSU_EXPECTED_HASH=${{ vars.EXPECTED_HASH }}
+          fi
+          if [ -e build/build.sh ]; then
+           LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh CC="/usr/bin/ccache clang"
+          else
+           tools/bazel run --disk_cache=/home/runner/.cache/bazel --config=fast --config=stamp --lto=thin //common:kernel_aarch64_dist -- --dist_dir=dist
+          fi
 
       - name: Build Kernel/LKM
         working-directory: android-kernel
