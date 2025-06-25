@@ -119,6 +119,7 @@ jobs:
           cp $GITHUB_WORKSPACE/KernelSU/namespace-2.c $GKI_ROOT/common/fs/namespace.c
           echo "[+] JetEcho  all finish !"
           df -h
+          ls -la $GKI_ROOT/common/android
 
 #      - name: Setup KernelSU
 #        env:
