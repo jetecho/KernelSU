@@ -119,6 +119,7 @@ jobs:
           echo "[+] JetEcho Replace namespcae.c from $GKI_ROOT/common/fs/namespace-3.c"
           echo "[+] JetEcho  all finish !"
           df -h
+          ls -la common
 
 #      - name: Setup KernelSU
 #        env:
