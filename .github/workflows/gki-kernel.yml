@@ -210,7 +210,6 @@ jobs:
         id: prepareArtifacts
         run: |
           OUTDIR=android-kernel/out/${{ inputs.version }}/dist
-          ls -la android-kernel/out/${{ inputs.version }}/dist
           if [ ! -e $OUTDIR ]; then
             OUTDIR=android-kernel/dist
           fi
