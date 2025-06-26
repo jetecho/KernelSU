@@ -214,6 +214,7 @@ jobs:
           if [ ! -e $OUTDIR ]; then
             OUTDIR=android-kernel/dist
           fi
+          ls -la $OUTDIR
           mkdir output
           if [ "${{ inputs.build_lkm}}" = "true" ]; then 
             llvm-strip-15 -d $OUTDIR/kernelsu.ko
