@@ -12,7 +12,7 @@
     </project>
     <project path="build/bazel_common_rules" name="platform/build/bazel_common_rules" groups="ddk" />
 <!--    <project path="common" name="kernel/common" revision="android15-6.6-2024-08" upstream="android15-6.6-2024-08" dest-branch="android15-6.6-2024-08" />-->
-    <project remote="oneplus" name="android_kernel_common_oneplus_sm8750" path="kernel/common" revision="oneplus/sm8750_v_15.0.0_oneplus_13"/>
+    <project remote="oneplus" name="android_kernel_common_oneplus_sm8750" path="common" revision="oneplus/sm8750_v_15.0.0_oneplus_13"/>
     <project path="common-modules/virtual-device" name="kernel/common-modules/virtual-device" revision="cb408c0047ffca1f23dc575ee06068048b89c8d2" upstream="android15-6.6" dest-branch="android15-6.6" />
     <project path="kernel/configs" name="kernel/configs" revision="main" upstream="main" dest-branch="main" />
     <project path="kernel/tests" name="kernel/tests" revision="main" upstream="main" dest-branch="main">
