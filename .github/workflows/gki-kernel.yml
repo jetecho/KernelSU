@@ -114,6 +114,7 @@ jobs:
           repo --version
           repo --trace sync -c -j$(nproc --all) --no-tags
           ls -la $GKI_ROOT
+          du -sh .
 
 #      - name: Setup KernelSU
 #        env:
