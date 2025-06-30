@@ -114,6 +114,9 @@ jobs:
           repo --version
           repo --trace sync -c -j$(nproc --all) --no-tags
           ls -la $GKI_ROOT
+          du -sh .
+          cd kernel_platform
+          tools/bazel query 'filter("*", attr(generator_function, define_msm_platforms, msm-kernel/...))'
 
 #      - name: Setup KernelSU
 #        env:
